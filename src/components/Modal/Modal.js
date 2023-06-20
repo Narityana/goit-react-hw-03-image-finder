@@ -1,20 +1,48 @@
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { createPortal } from 'react-dom';
+
 import css from './Modal.module.css';
-import * as basicLightbox from 'basiclightbox';
 
-const instance = basicLightbox.create(`
-    <img src="assets/images/image.png" width="800" height="600">
-`);
+const modalRoot = document.querySelector('#modal-root');
+class Modal extends Component {
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleKeyDown);
+  }
 
-instance.show();
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeyDown);
+  }
 
-const Modal = () => {
-  return (
-    <div class={css.overlay}>
-      <div class={css.modal}>
-        <img src="" alt="" />
-      </div>
-    </div>
-  );
+  handleKeyDown = event => {
+    if (event.code === 'Escape') {
+      this.props.onClose();
+    }
+  };
+
+  handleBackdropClick = event => {
+    if (event.target === event.currentTarget) {
+      this.props.onClose();
+    }
+  };
+
+  render() {
+    const { largeImageURL, tags } = this.props;
+    return createPortal(
+      <div className={css.overlay} onClick={this.handleBackdropClick}>
+        <div className={css.modal}>
+          <img src={largeImageURL} alt={tags} />
+        </div>
+      </div>,
+      modalRoot
+    );
+  }
+}
+
+Modal.propTypes = {
+  largeImageURL: PropTypes.string.isRequired,
+  tags: PropTypes.string,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default Modal;

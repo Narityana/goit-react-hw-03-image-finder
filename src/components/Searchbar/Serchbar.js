@@ -1,26 +1,49 @@
-import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import { FaSistrix } from 'react-icons/fa';
 
+import PropTypes from 'prop-types';
 import css from './Serchbar.module.css';
 
-const Searchbar = ({ onSubmit }) => {
-  return (
-    <header class={css.searchbar__container}>
-      <form class={css.searchbar__form} onSubmit={onSubmit}>
-        <button type="submit" class={css.searchbar__button}>
-          <span class={css.searchbar__buttonLabel}>Search</span>
-        </button>
+class Searchbar extends Component {
+  state = {
+    searchQuery: '',
+  };
 
-        <input
-          class={css.searchbar__input}
-          type="text"
-          autocomplete="off"
-          autofocus
-          placeholder="Search images and photos"
-        />
-      </form>
-    </header>
-  );
-};
+  onInput = event => {
+    this.setState({
+      searchQuery: event.currentTarget.value.toLowerCase().trim(),
+    });
+  };
+
+  onSubmit = event => {
+    event.preventDefault();
+    this.props.onSubmit(this.state.searchQuery);
+    this.setState({ searchQuery: '' });
+    event.currentTarget.reset();
+  };
+
+  render() {
+    return (
+      <header className={css.searchbar__container}>
+        <form className={css.searchbar__form} onSubmit={this.onSubmit}>
+          <button type="submit" className={css.searchbar__button}>
+            <FaSistrix className={css.searchbar__icon} />
+          </button>
+
+          <input
+            className={css.searchbar__input}
+            name="search"
+            type="text"
+            autoComplete="off"
+            autoFocus
+            placeholder="Search images and photos"
+            onInput={this.onInput}
+          />
+        </form>
+      </header>
+    );
+  }
+}
 
 Searchbar.propTypes = {
   onSubmit: PropTypes.func.isRequired,
