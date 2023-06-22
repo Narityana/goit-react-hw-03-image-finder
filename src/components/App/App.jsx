@@ -23,39 +23,43 @@ export class App extends Component {
     totalHits: null,
   };
 
-  async componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const { page, searchQuery } = this.state;
-
     if (page !== prevState.page || searchQuery !== prevState.searchQuery) {
-      this.setState({ isLoading: true });
-
-      try {
-        this.setState({ isLoading: true });
-        const imageData = await fetchImages(searchQuery, page);
-        if (imageData.totalHits === 0) {
-          toast.warning(
-            'No results were found for your search, please try something else.'
-          );
-        }
-        this.setState(prevState => ({
-          images: [...prevState.images, ...imageData.hits],
-          totalHits: imageData.totalHits,
-        }));
-      } catch (error) {
-        this.setState({ error });
-      } finally {
-        this.setState(prevState => ({
-          isLoading: false,
-          loadMore: prevState.page < Math.ceil(prevState.totalHits / 12),
-        }));
-      }
+      this.addImages();
     }
   }
+
+  addImages = async () => {
+    const { page, searchQuery } = this.state;
+    try {
+      this.setState({ isLoading: true });
+      const imageData = await fetchImages(searchQuery, page);
+      if (imageData.totalHits === 0) {
+        toast.warning(
+          'No results were found for your search, please try something else.'
+        );
+      }
+      this.setState(prevState => ({
+        images: [...prevState.images, ...imageData.hits],
+        totalHits: imageData.totalHits,
+      }));
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState(prevState => ({
+        isLoading: false,
+        loadMore: prevState.page < Math.ceil(prevState.totalHits / 12),
+      }));
+    }
+  };
 
   handleSubmit = searchQuery => {
     this.setState({
       searchQuery,
       images: [],
+      page: 1,
+      error: null,
     });
   };
 
